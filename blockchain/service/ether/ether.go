@@ -508,7 +508,7 @@ func (e *Ether) TraceTransaction(chainCode int64, address string) (string, error
 fromBlock:block number (in hex) OR
 toBlock: block number (in hex) OR
 */
-func (e *Ether) GetLogs(chainCode int64, contracts string, fromBlock, toBlock string, topics []string) (string, error) {
+func (e *Ether) GetLogs(chainCode int64, contracts string, fromBlock, toBlock string, topics ...string) (string, error) {
 	req := `
 			{
 		  "id": 1,
@@ -527,7 +527,7 @@ func (e *Ether) GetLogs(chainCode int64, contracts string, fromBlock, toBlock st
 			}
 		  ]
 		}`
-	req = fmt.Sprintf(req, contracts, fromBlock, "safe", topics[0])
+	req = fmt.Sprintf(req, contracts, fromBlock, toBlock, topics[0])
 	res, err := e.SendJsonRpc(chainCode, req)
 	if err != nil {
 		return "", err

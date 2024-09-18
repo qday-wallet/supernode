@@ -381,7 +381,7 @@ func (t *Tron) TraceTransaction(chainCode int64, address string) (string, error)
 	return "", fmt.Errorf("blockchain:%v,the method has not been implemented", chainCode)
 }
 
-func (t *Tron) GetLogs(chainCode int64, contracts string, fromBlock, toBlock string, topics []string) (string, error) {
+func (t *Tron) GetLogs(chainCode int64, contracts string, fromBlock, toBlock string, topics ...string) (string, error) {
 	req := `
 			{
 		  "id": 1,

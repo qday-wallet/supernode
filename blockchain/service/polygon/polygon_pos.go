@@ -518,7 +518,7 @@ func (e *PolygonPos) TraceTransaction(chainCode int64, address string) (string, 
 	return e.SendReq(chainCode, req, true)
 }
 
-func (e *PolygonPos) GetLogs(chainCode int64, contracts string, fromBlock, toBlock string, topics []string) (string, error) {
+func (e *PolygonPos) GetLogs(chainCode int64, contracts string, fromBlock, toBlock string, topics ...string) (string, error) {
 	req := `
 			{
 		  "id": 1,
@@ -531,13 +531,11 @@ func (e *PolygonPos) GetLogs(chainCode int64, contracts string, fromBlock, toBlo
 			  ],
 			  "fromBlock": "%v",
 			  "toBlock": "%v",
-			  "topics": [
-				"%v"
-			  ]
+			  "topics": ["%v"]
 			}
 		  ]
 		}`
-	req = fmt.Sprintf(req, contracts, fromBlock, "safe", topics[0])
+	req = fmt.Sprintf(req, contracts, fromBlock, toBlock, topics[0])
 	res, err := e.SendJsonRpc(chainCode, req)
 	if err != nil {
 		return "", err

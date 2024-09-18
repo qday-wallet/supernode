@@ -486,7 +486,7 @@ func (e *Bnb) SendRawTransaction(chainCode int64, signedTx string) (string, erro
 	return e.SendReq(chainCode, req, false)
 }
 
-func (e *Bnb) GetLogs(chainCode int64, contracts string, fromBlock, toBlock string, topics []string) (string, error) {
+func (e *Bnb) GetLogs(chainCode int64, contracts string, fromBlock, toBlock string, topics ...string) (string, error) {
 	req := `
 			{
 		  "id": 1,
@@ -505,7 +505,7 @@ func (e *Bnb) GetLogs(chainCode int64, contracts string, fromBlock, toBlock stri
 			}
 		  ]
 		}`
-	req = fmt.Sprintf(req, contracts, fromBlock, "safe", topics[0])
+	req = fmt.Sprintf(req, contracts, fromBlock, toBlock, topics[0])
 	res, err := e.SendJsonRpc(chainCode, req)
 	if err != nil {
 		return "", err

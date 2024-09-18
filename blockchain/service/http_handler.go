@@ -487,8 +487,12 @@ func (h *HttpHandler) GetLogs(ctx *gin.Context) {
 	contract := gjson.ParseBytes(b).Get("contract").String()
 	fromBlock := gjson.ParseBytes(b).Get("fromBlock").String()
 	toBlock := gjson.ParseBytes(b).Get("toBlock").String()
-	topic := gjson.ParseBytes(b).Get("topics").String()
-	res, err := h.exBlockChainClients[blockChainCode].GetLogs(blockChainCode, contract, fromBlock, toBlock, []string{topic})
+	topics := gjson.ParseBytes(b).Get("topics").Array()
+	list := make([]string, 0, 2)
+	for _, t := range topics {
+		list = append(list, t.String())
+	}
+	res, err := h.exBlockChainClients[blockChainCode].GetLogs(blockChainCode, contract, fromBlock, toBlock, list[0])
 	if err != nil {
 		h.Error(ctx, "", ctx.Request.RequestURI, err.Error())
 		return

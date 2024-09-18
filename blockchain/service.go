@@ -44,5 +44,5 @@ type ExApi interface {
 	EstimateGas(chainCode int64, from, to, data string) (string, error)
 	EstimateGasForTron(chainCode int64, from, to, functionSelector, parameter string) (string, error)
 	GetAccountResourceForTron(chainCode int64, address string) (string, error)
-	GetLogs(chainCode int64, contracts string, fromBlock, toBlock string, topics []string) (string, error)
+	GetLogs(chainCode int64, contracts string, fromBlock, toBlock string, topics ...string) (string, error)
 }

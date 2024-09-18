@@ -13,12 +13,12 @@ import (
 
 func Init() blockchain.API {
 	cfg := config.LoadConfig("./../../../cmd/blockchain/config_polygon.json")
-	return NewPolygonPos(cfg.Cluster[66], 66, xlog.NewXLogger())
+	return NewPolygonPos(cfg.Cluster[201], 201, xlog.NewXLogger())
 }
 
 func Init2() blockchain.ExApi {
 	cfg := config.LoadConfig("./../../../cmd/blockchain/config_polygon.json")
-	return NewPolygonPos2(cfg.Cluster[64], 64, xlog.NewXLogger())
+	return NewPolygonPos2(cfg.Cluster[201], 201, xlog.NewXLogger())
 }
 
 func TestPolygonPos_GetLatestBlock(t *testing.T) {
@@ -111,5 +111,15 @@ func TestPolygonPos_GasPrice(t *testing.T) {
 		gas := gjson.Parse(resp).Get("result").String()
 		gas, _ = util.HexToInt(gas)
 		t.Log(gas)
+	}
+}
+
+func TestPolygonPos_GetLogs(t *testing.T) {
+	s := Init2()
+	resp, err := s.GetLogs(201, "0xe06bd4f5aac8d0aa337d13ec88db6defc6eaeefe", "0x3B19DFE", "0x3B19DFE", "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef")
+	if err != nil {
+		t.Error(err)
+	} else {
+		t.Log("ok:", resp)
 	}
 }
