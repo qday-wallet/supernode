@@ -1,16 +1,13 @@
 package ether
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"math"
 	"strings"
 	"time"
 
-	"github.com/gorilla/websocket"
 	"github.com/sunjiangjun/supernode/blockchain"
 	"github.com/sunjiangjun/supernode/blockchain/chain"
 	"github.com/sunjiangjun/supernode/blockchain/config"
@@ -506,107 +503,39 @@ func (e *Ether) TraceTransaction(chainCode int64, address string) (string, error
 	return e.SendReq(chainCode, req, true)
 }
 
+/*
+*
+fromBlock:block number (in hex) OR
+toBlock: block number (in hex) OR
+*/
+func (e *Ether) GetLogs(chainCode int64, contracts string, fromBlock, toBlock string, topics []string) (string, error) {
+	req := `
+			{
+		  "id": 1,
+		  "jsonrpc": "2.0",
+		  "method": "eth_getLogs",
+		  "params": [
+			{
+			  "address": [
+				"%v"
+			  ],
+			  "fromBlock": "%v",
+			  "toBlock": "%v",
+			  "topics": [
+				"%v"
+			  ]
+			}
+		  ]
+		}`
+	req = fmt.Sprintf(req, contracts, fromBlock, "safe", topics[0])
+	res, err := e.SendJsonRpc(chainCode, req)
+	if err != nil {
+		return "", err
+	}
+	return res, nil
+}
+
 func (e *Ether) SendReqByWs(blockChain int64, receiverCh chan string, sendCh chan string) (string, error) {
-	cluster := e.BalanceCluster(false)
-	if cluster == nil {
-		//不存在节点
-		return "", errors.New("blockchain node has not found")
-	}
-
-	host, err := e.blockChainClient.Subscribe(cluster.NodeUrl, cluster.NodeToken)
-	if err != nil {
-		return "", err
-	}
-
-	conn, _, err := websocket.DefaultDialer.Dial(host, nil)
-	if err != nil {
-		return "", err
-	}
-	defer conn.Close()
-	if err = conn.SetWriteDeadline(time.Now().Add(time.Second)); err != nil {
-		log.Fatalf("SetWriteDeadline: %v", err)
-		return "", err
-	}
-
-	if err = conn.SetReadDeadline(time.Now().Add(time.Second)); err != nil {
-		log.Fatalf("SetReadDeadline: %v", err)
-		return "", err
-	}
-
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	go func(sendCh chan string) {
-		interrupt := true
-		for interrupt {
-			select {
-			case sendMsg := <-sendCh:
-				//订阅命令 或取消订阅命令
-				if err := conn.WriteMessage(websocket.TextMessage, []byte(sendMsg)); err != nil {
-					log.Fatalf("WriteMessage: %v", err)
-				}
-			case <-ctx.Done():
-				interrupt = false
-			}
-		}
-	}(sendCh)
-
-	for {
-		//接受消息
-		_, p, err := conn.ReadMessage()
-		if err != nil {
-			log.Fatalf("ReadMessage: %v", err)
-		}
-
-		// 异常数据处理
-		r := gjson.ParseBytes(p)
-		if r.Get("error").Exists() {
-			mp := make(map[string]interface{}, 0)
-			mp["result"] = r.Get("error").String()
-			mp["cmd"] = 0
-			rs, _ := json.Marshal(mp)
-			receiverCh <- string(rs)
-			cancel()
-			break
-		}
-
-		//订阅命名响应
-		//{"id":1,"result":"0x9a52eeddc2b289f985c0e23a7d8427c8","jsonrpc":"2.0"}
-
-		if r.Get("result").Exists() && strings.HasPrefix(r.Get("result").String(), "0x") {
-			//订阅成功
-			mp := make(map[string]interface{}, 0)
-			mp["result"] = r.Get("result").String()
-			mp["cmd"] = 1
-			rs, _ := json.Marshal(mp)
-			receiverCh <- string(rs)
-			continue
-		}
-
-		//取消订阅命令响应
-		//{ "id": 1, "result": true, "jsonrpc": "2.0" }
-		if r.Get("result").IsBool() {
-			if r.Get("result").Bool() {
-				//取消订阅成功
-				mp := make(map[string]interface{}, 0)
-				mp["result"] = r.Get("result").String()
-				mp["cmd"] = 3
-				rs, _ := json.Marshal(mp)
-				receiverCh <- string(rs)
-				cancel()
-				break
-			} else {
-				//取消订阅失败
-				mp := make(map[string]interface{}, 0)
-				mp["result"] = r.Get("result").String()
-				mp["cmd"] = 2
-				rs, _ := json.Marshal(mp)
-				receiverCh <- string(rs)
-				continue
-			}
-		}
-
-		receiverCh <- string(p)
-	}
 
 	return "", nil
 }

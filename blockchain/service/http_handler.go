@@ -472,6 +472,31 @@ func (h *HttpHandler) GetLatestBlock(ctx *gin.Context) {
 	h.Success(ctx, "", res, ctx.Request.RequestURI)
 }
 
+func (h *HttpHandler) GetLogs(ctx *gin.Context) {
+	b, err := io.ReadAll(ctx.Request.Body)
+	if err != nil {
+		h.Error(ctx, "", ctx.Request.RequestURI, err.Error())
+		return
+	}
+	blockChainCode := gjson.ParseBytes(b).Get("chain").Int()
+	if _, ok := h.exBlockChainClients[blockChainCode]; !ok {
+		h.Error(ctx, string(b), ctx.Request.RequestURI, fmt.Sprintf("blockchain:%v is not supported", blockChainCode))
+		return
+	}
+
+	contract := gjson.ParseBytes(b).Get("contract").String()
+	fromBlock := gjson.ParseBytes(b).Get("fromBlock").String()
+	toBlock := gjson.ParseBytes(b).Get("toBlock").String()
+	topic := gjson.ParseBytes(b).Get("topics").String()
+	res, err := h.exBlockChainClients[blockChainCode].GetLogs(blockChainCode, contract, fromBlock, toBlock, []string{topic})
+	if err != nil {
+		h.Error(ctx, "", ctx.Request.RequestURI, err.Error())
+		return
+	}
+
+	h.Success(ctx, "", res, ctx.Request.RequestURI)
+}
+
 // GasPrice Returns the current price per gas in wei.
 func (h *HttpHandler) GasPrice(ctx *gin.Context) {
 	b, err := io.ReadAll(ctx.Request.Body)

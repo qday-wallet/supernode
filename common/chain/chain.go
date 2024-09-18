@@ -11,7 +11,7 @@ import (
 // dev
 var defaultChainCode = map[string]map[int64]int8{
 	"ETH":     {200: 1, 2001: 1},
-	"POLYGON": {201: 1, 42161: 1, 42162: 1, 8453: 1, 43114: 1},
+	"POLYGON": {201: 1, 42161: 1, 42162: 1, 8453: 1, 43114: 1, 1001: 1, 45221: 1},
 	"BSC":     {202: 1, 2021: 1},
 	"TRON":    {205: 1, 2051: 1},
 	"BTC":     {300: 1},
@@ -21,7 +21,7 @@ var defaultChainCode = map[string]map[int64]int8{
 
 /**
   eth: 1: main,5:Goerli
-  L2： 42161：arb.main,10:op.main,8453:base.main 43114:aval.main
+  L2： 42161：arb.main,10:op.main,8453:base.main 43114:aval.main,45221:qday.main,1001:qday.test
   polygon:	137:main,
   bsc: 	56:main,97:test
   tron: 115:main,118:test
@@ -33,7 +33,7 @@ var defaultChainCode = map[string]map[int64]int8{
 // main
 //var defaultChainCode = map[string]map[int64]int8{
 //	"ETH":     {1: 1, 5: 1},
-//	"POLYGON": {137: 1, 42161: 1, 10: 1, 8453: 1, 43114: 1},
+//	"POLYGON": {137: 1, 42161: 1, 10: 1, 8453: 1, 43114: 1,45221: 1, 1001: 1},
 //	"BSC":     {56: 1, 97: 1},
 //	"TRON":    {115: 1, 118: 1},
 //	"BTC":     {198: 1, 199: 1},

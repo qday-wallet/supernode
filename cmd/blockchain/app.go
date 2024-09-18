@@ -57,6 +57,7 @@ func main() {
 	origin.POST("/account/tokenBalance", srv.GetTokenBalance)
 	origin.POST("/account/nonce", srv.GetNonce)
 	origin.POST("/block/latest", srv.GetLatestBlock)
+	origin.POST("/tx/logs", srv.GetLogs)
 	origin.POST("/tx/sendRawTransaction", srv.SendRawTx)
 	origin.POST("/gas/price", srv.GasPrice)
 	origin.POST("/gas/estimateGas", srv.EstimateGas)

@@ -486,6 +486,33 @@ func (e *Bnb) SendRawTransaction(chainCode int64, signedTx string) (string, erro
 	return e.SendReq(chainCode, req, false)
 }
 
+func (e *Bnb) GetLogs(chainCode int64, contracts string, fromBlock, toBlock string, topics []string) (string, error) {
+	req := `
+			{
+		  "id": 1,
+		  "jsonrpc": "2.0",
+		  "method": "eth_getLogs",
+		  "params": [
+			{
+			  "address": [
+				"%v"
+			  ],
+			  "fromBlock": "%v",
+			  "toBlock": "%v",
+			  "topics": [
+				"%v"
+			  ]
+			}
+		  ]
+		}`
+	req = fmt.Sprintf(req, contracts, fromBlock, "safe", topics[0])
+	res, err := e.SendJsonRpc(chainCode, req)
+	if err != nil {
+		return "", err
+	}
+	return res, nil
+}
+
 func (e *Bnb) SendReqByWs(blockChain int64, receiverCh chan string, sendCh chan string) (string, error) {
 	return "", nil
 }

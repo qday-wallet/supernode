@@ -381,6 +381,33 @@ func (t *Tron) TraceTransaction(chainCode int64, address string) (string, error)
 	return "", fmt.Errorf("blockchain:%v,the method has not been implemented", chainCode)
 }
 
+func (t *Tron) GetLogs(chainCode int64, contracts string, fromBlock, toBlock string, topics []string) (string, error) {
+	req := `
+			{
+		  "id": 1,
+		  "jsonrpc": "2.0",
+		  "method": "eth_getLogs",
+		  "params": [
+			{
+			  "address": [
+				"%v"
+			  ],
+			  "fromBlock": "%v",
+			  "toBlock": "%v",
+			  "topics": [
+				"%v"
+			  ]
+			}
+		  ]
+		}`
+	req = fmt.Sprintf(req, contracts, fromBlock, toBlock, topics[0])
+	res, err := t.SendJsonRpc(chainCode, req)
+	if err != nil {
+		return "", err
+	}
+	return res, nil
+}
+
 func (t *Tron) SendReq(blockChain int64, reqBody string, url string) (resp string, err error) {
 	reqBody = strings.Replace(reqBody, "\t", "", -1)
 	reqBody = strings.Replace(reqBody, "\n", "", -1)
